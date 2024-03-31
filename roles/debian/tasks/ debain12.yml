@@ -1,0 +1,139 @@
+- name: Set timezone
+  timezone:
+    name: Africa/Lagos
+
+- name: Update The Apt Repository
+  apt:
+    update_cache: yes
+
+- name: Install Apache2
+  apt:
+    name: apache2
+    state: present
+
+- name: Start The Apache2 Service
+  service:
+    name: apache2
+    state: started
+
+- name: Enable The Apache2 Service
+  service:
+    name: apache2
+    enabled: yes
+
+- name: Display Hostname
+  shell: echo "<h2>$HOSTNAME</h2>" >> /var/www/html/index.html
+  tags: host_name
+
+- name: Remove The Default Apache2 Configuration File
+  file:
+    path: /etc/apache2/sites-available/000-default.conf
+    state: absent
+  register: removed_file
+
+- name: Create The Apache2 HTML Page
+  copy:
+    content: |
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Random Color generator</title>
+          <style>
+            body {
+              margin: 0;
+              font-family: cursive;
+            }
+            h1 {
+              text-align: center;
+            }
+            .container {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+            }
+            .color-container {
+              background-color: orange;
+              width: 300px;
+              height: 150px;
+              color: white;
+              margin: 5px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              font-size: 25px;
+              text-shadow: 2px 4px rgba(0, 0, 0, 0.5);
+              border-radius: 10px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Random Color Generator</h1>
+          <div class="container">
+            {% for _ in range(30) %}
+              <div class="color-container">#{{ range(6)|map('regex_replace', '[^0-9a-f]', '')|join|random }}</div>
+            {% endfor %}
+          </div>
+          <script>
+            const containerEl = document.querySelector(".container");
+
+            for (let index = 0; index < 30; index++) {
+              const colorContainerEl = document.createElement("div");
+              colorContainerEl.classList.add("color-container");
+              containerEl.appendChild(colorContainerEl);
+            }
+
+            const colorContainerEls = document.querySelectorAll(".color-container");
+
+            generateColors();
+
+            function generateColors() {
+              colorContainerEls.forEach((colorContainerEl) => {
+                const newColorCode = randomColor();
+                colorContainerEl.style.backgroundColor = "#" + newColorCode;
+                colorContainerEl.innerText = "#" + newColorCode;
+              });
+            }
+
+            function randomColor() {
+              const chars = "0123456789abcdef";
+              const colorCodeLength = 6;
+              let colorCode = "";
+              for (let index = 0; index < colorCodeLength; index++) {
+                const randomNum = Math.floor(Math.random() * chars.length);
+                colorCode += chars.substring(randomNum, randomNum + 1);
+              }
+              return colorCode;
+            }
+          </script>
+        </body>
+      </html>
+    dest: /var/www/html/index.html
+
+- name: Remove The Default Apache2 Configuration File
+  file:
+    path: /etc/apache2/sites-available/000-default.conf
+    state: absent
+  register: removed_file
+
+- name: Create a new Apache2 Default Configuration File
+  copy:
+    content: |
+      <VirtualHost *:80>
+        ServerName bog-reaper.com.ng
+        ServerAlias terraform-test.bog-reaper.com.ng
+        ServerAdmin gfbraimah@gmail.com
+        DocumentRoot /var/www/html
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+      </VirtualHost>
+    dest: /etc/apache2/sites-available/000-default.conf
+  register: new_default_config
+
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted

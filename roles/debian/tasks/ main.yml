@@ -1,0 +1,2 @@
+- name: Debian 12 Web Server Conifguring
+  import_tasks: debain12.yml

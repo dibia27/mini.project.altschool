@@ -1,0 +1,2 @@
+- name: Amazon Linux 2 Web Server Conifguring
+  import_tasks: amz_linux.yml

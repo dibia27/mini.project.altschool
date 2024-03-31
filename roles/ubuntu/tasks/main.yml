@@ -1,0 +1,2 @@
+- name: Ubuntu 20.04 Web Server Configuring
+  import_tasks: ubuntu20.04.yml

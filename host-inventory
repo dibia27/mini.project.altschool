@@ -1,0 +1,7 @@
+[webServers]
+webServer2-UBUNT ansible_host=YOUR_IP_WOULD_BE_HEREansible_user=ubuntu
+webServer3-DEBI12 ansible_host= YOUR_IP_WOULD_BE_HERE ansible_user=admin
+webServer1-AMZL2 ansible_host=YOUR_IP_WOULD_BE_HERE ansible_user=ec2-user
+
+##leave this place blank so only leave the [webServers]
+

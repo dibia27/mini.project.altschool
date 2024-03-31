@@ -1,0 +1,20 @@
+---
+- hosts: webServer1-AMZL2
+  gather_facts: no
+  roles:
+    - name: Configure Amazon Linux 2 Server
+      role: amz
+
+- hosts: webServer2-UBUNT
+  gather_facts: no
+  become: yes
+  roles:
+    - name: Configure Ubuntu 20.04 Focal Fossa Server
+      role: ubuntu
+
+- hosts: webServer3-DEBI12
+  gather_facts: no
+  become: yes
+  roles:
+    - name: Configure Debian 11 Bullseye Server
+      role: debian
